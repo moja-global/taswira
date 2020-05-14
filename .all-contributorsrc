@@ -23,6 +23,15 @@
         "doc",
         "code"
       ]
+    },
+    {
+      "login": "gmajan",
+      "name": "Guy Janssen",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/8733319?v=4",
+      "profile": "https://github.com/gmajan",
+      "contributions": [
+        "projectManagement"
+      ]
     }
   ],
   "contributorsPerLine": 7,
