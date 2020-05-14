@@ -13,11 +13,22 @@
       "contributions": [
         "projectManagement"
       ]
+    },
+    {
+      "login": "abhineet97",
+      "name": "Abhineet Tamrakar",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/11965776?v=4",
+      "profile": "https://abhineet.tk",
+      "contributions": [
+        "doc",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
-  "projectName": "Import-Me",
+  "projectName": "GSoC.FLINT.Visualisation_Tool",
   "projectOwner": "moja-global",
   "repoType": "github",
-  "repoHost": "https://github.com"
+  "repoHost": "https://github.com",
+  "skipCi": true
 }
