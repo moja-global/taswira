@@ -1,0 +1,9 @@
+README.md
+setup.py
+taswira/__init__.py
+taswira/console.py
+taswira.egg-info/PKG-INFO
+taswira.egg-info/SOURCES.txt
+taswira.egg-info/dependency_links.txt
+taswira.egg-info/requires.txt
+taswira.egg-info/top_level.txt
