@@ -15,3 +15,8 @@ Now, you can activate the virtual environment by running:
 ```
 poetry shell
 ```
+
+Finally, you can run the tests by executing:
+```
+pytest
+```
