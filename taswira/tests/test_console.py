@@ -78,19 +78,11 @@ def terracotta_server(testdb):
         assert not proc.is_alive()
 
 
-class TestTerracottaIntegration:
-    def test_api(self, terracotta_server):
-        """Check if API is working or not"""
+def test_terracotta_integration(terracotta_server):
+    """Check Terracotta integration by making requests to its REST API."""
 
-        test_url = f"{terracotta_server}/keys"
+    test_endpoints = ('apidoc', "keys")
 
-        with urllib.request.urlopen(test_url) as response:
-            assert response.getcode() == 200
-
-    def test_api_docs(self, terracotta_server):
-        """Check if API docs are accessible or not"""
-
-        test_url = f"{terracotta_server}/apidoc"
-
-        with urllib.request.urlopen(test_url) as response:
+    for endpoint in test_endpoints:
+        with urllib.request.urlopen(f"{terracotta_server}/{endpoint}") as response:
             assert response.getcode() == 200
