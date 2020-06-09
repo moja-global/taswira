@@ -64,7 +64,7 @@ def testdb(make_GCBM_raster, tmpdir_factory):
 
 @pytest.fixture(scope='module')
 def terracotta_server(testdb):
-    """Starts a Terracotta server with no data."""
+    """Starts a Terracotta server with a test DB."""
     from taswira.console import start_terracotta
     proc = Process(target=start_terracotta, args=(str(testdb),))
     proc.start()
