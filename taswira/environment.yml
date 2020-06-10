@@ -1,0 +1,17 @@
+name: taswira
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python>=3.6
+  - numpy
+  - rasterio>=1.0
+  - shapely
+  - crick
+  - pip
+  - pip:
+    - terracotta==0.6.0
+    - pytest>=5.2
+    - pylint>=2.5.2
+    - autopep8>=1.5.3
+
