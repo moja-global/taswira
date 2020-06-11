@@ -1,3 +1,4 @@
+import os.path
 import time
 import urllib.request
 from multiprocessing import Process
@@ -8,8 +9,26 @@ import rasterio
 
 from taswira.helpers import get_free_port
 
+GCBM_TEST_FILES = [
+    {
+        'dtype': 'float32',
+        'name': 'AG_Biomass_C_2010.tiff',
+        'title': 'AG_Biomass_C',
+        'year': '2010'
+    },
+    {
+        'dtype': 'int16',
+        'name': 'Age_2013.tiff',
+        'title': 'Age',
+        'year': '2013'
+    }
+]
+
+
 @pytest.fixture(scope='session')
-def make_GCBM_raster(tmpdir_factory):
+def GCBM_raster_files(tmpdir_factory):
+    outpath = tmpdir_factory.mktemp('raster')
+
     def _make_GCBM_raster(dtype, name):
         """
         Generate a GeoTIFF rasters.
@@ -32,22 +51,21 @@ def make_GCBM_raster(tmpdir_factory):
             'transform': rasterio.transform.from_origin(-119.3,  50.0, 0.01, -0.01),
             'tiled': True,
             'compress': 'ZSTD',
-            'bigtiff': True,
+            'bigtiff': 'YES',
             'zstd_level': 1
         }
 
-        outpath = tmpdir_factory.mktemp('raster')
-        raster_path = outpath.join('{}.tif'.format(name))
+        raster_path = outpath.join('{}'.format(name))
         with rasterio.open(str(raster_path), 'w', **profile) as dst:
             dst.write(raster_data, 1)
 
         return raster_path
 
-    return _make_GCBM_raster
+    return [_make_GCBM_raster(file['dtype'], file['name']) for file in GCBM_TEST_FILES]
 
 
 @pytest.fixture(scope='session')
-def testdb(make_GCBM_raster, tmpdir_factory):
+def testdb(GCBM_raster_files, tmpdir_factory):
     """A pre-populated Terracotta raster database. (TODO: Add metadata)"""
     from terracotta import get_driver
 
@@ -57,8 +75,8 @@ def testdb(make_GCBM_raster, tmpdir_factory):
     driver.create(keys)
 
     with driver.connect():
-        for dtype, name in [('float32', 'AGBiomassC_2010'), ('int16', 'Age_2013')]:
-            driver.insert(('val11', 'x'), str(make_GCBM_raster(dtype, name)))
+        for raster in GCBM_raster_files:
+            driver.insert(('val11', 'x'), str(raster))
 
     return dbpath
 
@@ -88,3 +106,20 @@ def test_terracotta_integration(terracotta_server):
     for endpoint in test_endpoints:
         with urllib.request.urlopen(f"{terracotta_server}/{endpoint}") as response:
             assert response.getcode() == 200
+
+
+def test_ingest(GCBM_raster_files, tmpdir):
+    from taswira.console import ingest
+    from terracotta import get_driver
+
+    rasterdir = GCBM_raster_files[0].dirname
+    dbpath = ingest(rasterdir, tmpdir)
+
+    assert os.path.exists(dbpath)
+
+    driver = get_driver(dbpath, provider='sqlite')
+    assert driver.key_names == ('title', 'year')
+    
+    datasets = driver.get_datasets()
+    for i, f in enumerate(GCBM_TEST_FILES):
+        assert datasets[(f['title'], f['year'])] == str(GCBM_raster_files[i])
