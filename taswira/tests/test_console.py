@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 import rasterio
 
+from taswira.helpers import get_free_port
 
 @pytest.fixture(scope='session')
 def make_GCBM_raster(tmpdir_factory):
@@ -66,12 +67,13 @@ def testdb(make_GCBM_raster, tmpdir_factory):
 def terracotta_server(testdb):
     """Starts a Terracotta server with a test DB."""
     from taswira.console import start_terracotta
-    proc = Process(target=start_terracotta, args=(str(testdb),))
+    port = get_free_port()
+    proc = Process(target=start_terracotta, args=(str(testdb), port))
     proc.start()
     try:
         time.sleep(5)
         assert proc.is_alive()
-        yield "http://localhost:5000"
+        yield f'http://localhost:{port}'
     finally:
         proc.terminate()
         proc.join(5)
