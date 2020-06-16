@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 import rasterio
 
-from taswira.helpers import get_free_port
+from taswira.scripts.helpers import get_free_port
 
 GCBM_TEST_FILES = [
     {
@@ -84,7 +84,7 @@ def testdb(GCBM_raster_files, tmpdir_factory):
 @pytest.fixture(scope='module')
 def terracotta_server(testdb):
     """Starts a Terracotta server with a test DB."""
-    from taswira.console import start_terracotta
+    from taswira.scripts.console import start_terracotta
     port = get_free_port()
     proc = Process(target=start_terracotta, args=(str(testdb), port))
     proc.start()
@@ -109,7 +109,7 @@ def test_terracotta_integration(terracotta_server):
 
 
 def test_ingest(GCBM_raster_files, tmpdir):
-    from taswira.console import ingest
+    from taswira.scripts.console import ingest
     from terracotta import get_driver
 
     rasterdir = GCBM_raster_files[0].dirname

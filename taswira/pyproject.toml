@@ -1,0 +1,11 @@
+[build-system]
+requires = ["flit_core >=2,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.metadata]
+module = "taswira"
+author = "Abhineet Tamrakar"
+author-email = "abhineet97@gmail.com"
+
+[tool.flit.scripts]
+taswira = "taswira:main"

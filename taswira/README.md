@@ -13,10 +13,22 @@ $ conda env create -f environment.yml
 $ conda activate taswira
 ```
 
-Now, you can run tests:
+Install, the CLI for development:
+
+```sh
+$ flit install -s
+```
+
+Now, you can run the tests:
 
 ```sh
 $ pytest
+```
+
+Or, execute the CLI:
+
+```sh
+$ taswira
 ```
 
 [miniconda]: https://docs.conda.io/en/latest/miniconda.html
