@@ -1,10 +1,11 @@
+import os
+import shutil
 import time
 from multiprocessing import Process
 
 import numpy as np
 import pytest
 import rasterio
-
 from taswira.scripts.helpers import get_free_port
 
 GCBM_TEST_FILES = [
@@ -68,13 +69,20 @@ def GCBM_raster_files(tmpdir_factory):
             'zstd_level': 1
         }
 
-        raster_path = outpath.join('{}'.format(name))
+        raster_path = outpath.join(name)
         with rasterio.open(str(raster_path), 'w', **profile) as dst:
             dst.write(raster_data, 1)
 
         return raster_path
 
     return [_make_GCBM_raster(file['dtype'], file['name']) for file in GCBM_TEST_FILES]
+
+
+@pytest.fixture(scope='session')
+def GCBM_compiled_output(tmpdir_factory):
+    dbpath = os.path.abspath('tests/scripts/sample_compiled_gcbm_output.db')
+    outpath = tmpdir_factory.mktemp('db')
+    return shutil.copy(dbpath, outpath)
 
 
 @pytest.fixture(scope='session')
@@ -109,3 +117,11 @@ def terracotta_server(testdb):
         proc.terminate()
         proc.join(5)
         assert not proc.is_alive()
+
+@pytest.fixture(scope='session')
+def set_config():
+    def _set_config():
+        from taswira.scripts import update_config
+        update_config(TEST_CONFIG)
+
+    return _set_config
