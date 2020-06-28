@@ -2,6 +2,8 @@
 
 This repository is for planning and discussing [this project](https://summerofcode.withgoogle.com/projects/#4595399286849536) of the Google Summer of Code 2020.
 
+For code and related development information, please see the [`taswira`](https://github.com/moja-global/GSoC.FLINT.Visualisation_Tool/tree/master/taswira) sub-directory.
+
 ## Project Details
 
 **Mentors:** [Guy](https://github.com/gmajan) (Org-admin), [koukas](https://github.com/kaskou) (Primary mentor)
