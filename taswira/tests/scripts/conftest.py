@@ -8,38 +8,31 @@ import pytest
 import rasterio
 from taswira.scripts.helpers import get_free_port
 
-GCBM_TEST_FILES = [
-    {
-        'dtype': 'float32',
-        'name': 'AG_Biomass_C_2010.tiff',
-        'title': 'AG_Biomass_C',
-        'year': '2010'
-    },
-    {
-        'dtype': 'int16',
-        'name': 'NPP_2013.tiff',
-        'title': 'NPP',
-        'year': '2013'
-    }
-]
+GCBM_TEST_FILES = [{
+    'dtype': 'float32',
+    'name': 'AG_Biomass_C_2010.tiff',
+    'title': 'AG_Biomass_C',
+    'year': '2010'
+}, {
+    'dtype': 'int16',
+    'name': 'NPP_2013.tiff',
+    'title': 'NPP',
+    'year': '2013'
+}]
 
-
-TEST_CONFIG = [
-    {
-        "title": "AG Biomass",
-        "database_indicator": "Aboveground Biomass",
-        "file_pattern": "AG_Biomass_C_*.tiff",
-        "palette": "YlGnBu",
-        "graph_units": "Mtc",
-    },
-    {
-        "title": "NPP",
-        "database_indicator": "NPP",
-        "file_pattern": "NPP*.tiff",
-        "palette": "Greens",
-        "graph_units": "Ktc",
-    }
-]
+TEST_CONFIG = [{
+    "title": "AG Biomass",
+    "database_indicator": "Aboveground Biomass",
+    "file_pattern": "AG_Biomass_C_*.tiff",
+    "palette": "YlGnBu",
+    "graph_units": "Mtc",
+}, {
+    "title": "NPP",
+    "database_indicator": "NPP",
+    "file_pattern": "NPP*.tiff",
+    "palette": "Greens",
+    "graph_units": "Ktc",
+}]
 
 
 @pytest.fixture(scope='session')
@@ -61,8 +54,11 @@ def GCBM_raster_files(tmpdir_factory):
             'width': raster_data.shape[1],
             'height': raster_data.shape[0],
             'count': 1,
-            'crs': {'init': 'epsg:4326'},
-            'transform': rasterio.transform.from_origin(-119.3,  50.0, 0.01, -0.01),
+            'crs': {
+                'init': 'epsg:4326'
+            },
+            'transform':
+            rasterio.transform.from_origin(-119.3, 50.0, 0.01, -0.01),
             'tiled': True,
             'compress': 'ZSTD',
             'bigtiff': 'YES',
@@ -75,7 +71,10 @@ def GCBM_raster_files(tmpdir_factory):
 
         return raster_path
 
-    return [_make_GCBM_raster(file['dtype'], file['name']) for file in GCBM_TEST_FILES]
+    return [
+        _make_GCBM_raster(file['dtype'], file['name'])
+        for file in GCBM_TEST_FILES
+    ]
 
 
 @pytest.fixture(scope='session')
@@ -105,9 +104,9 @@ def testdb(GCBM_raster_files, tmpdir_factory):
 @pytest.fixture(scope='module')
 def terracotta_server(testdb):
     """Starts a Terracotta server with a test DB."""
-    from taswira.scripts.console import start_terracotta
+    from taswira.scripts.console import start_servers
     port = get_free_port()
-    proc = Process(target=start_terracotta, args=(str(testdb), port))
+    proc = Process(target=start_servers, args=(str(testdb), port))
     proc.start()
     try:
         time.sleep(5)
@@ -117,6 +116,7 @@ def terracotta_server(testdb):
         proc.terminate()
         proc.join(5)
         assert not proc.is_alive()
+
 
 @pytest.fixture(scope='session')
 def set_config():
