@@ -1,3 +1,4 @@
+"""Ingest data into a Terracotta DB."""
 import glob
 import os
 import re
@@ -10,10 +11,9 @@ from .metadata import get_metadata
 DB_NAME = 'terracotta.sqlite'
 GCBM_RASTER_NAME_PATTERN = r'(?P<title>\w+)_(?P<year>\d{4}).tiff'
 GCBM_RASTER_KEYS = ('title', 'year')
-# TODO: Add descriptions.
 GCBM_RASTER_KEYS_DESCRIPTION = {
-    'title': '',
-    'year': '',
+    'title': 'Title of raster.',
+    'year': 'Year of raster.',
 }
 
 
@@ -61,30 +61,29 @@ def ingest(rasterdir, db_results, outputdir):
     Returns:
         Path to generated DB.
     """
-    driver = tc.get_driver(os.path.join(
-        outputdir, DB_NAME), provider='sqlite')
+    driver = tc.get_driver(os.path.join(outputdir, DB_NAME), provider='sqlite')
     driver.create(GCBM_RASTER_KEYS, GCBM_RASTER_KEYS_DESCRIPTION)
 
     metadata = get_metadata(db_results)
 
     with driver.connect():
-        for c in get_config():
-            raster_files = glob.glob(rasterdir + os.sep + c['file_pattern'])
-            indicator = c['database_indicator']
-            indicator_metadata = metadata[indicator]
+        for config in get_config():
+            raster_files = glob.glob(rasterdir + os.sep +
+                                     config['file_pattern'])
+            indicator = config['database_indicator']
             for raster_path in raster_files:
                 raster_filename = os.path.basename(raster_path)
 
                 match = re.match(GCBM_RASTER_NAME_PATTERN, raster_filename)
                 if match is None:
                     raise ValueError(
-                        f'Input file {raster_filename} does not match raster pattern')
+                        f'Input file {raster_filename} does not match raster pattern'
+                    )
 
                 keys = _, year = match.groups()
                 computed_metadata = driver.compute_metadata(
                     raster_path,
-                    extra_metadata={indicator: str(indicator_metadata[year])}
-                )
+                    extra_metadata={indicator: str(metadata[indicator][year])})
                 driver.insert(keys, raster_path, metadata=computed_metadata)
 
     return driver.path
