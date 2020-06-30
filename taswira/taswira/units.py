@@ -1,8 +1,9 @@
+"""Enum and related-utilities for handling geographical units."""
 from enum import Enum
 
 
 class Units(Enum):
-    # PerHa, Mult, Label
+    """Enum of units containing tuple (IsPerHa, Mult, Label)"""
     Blank = False, 1, ""
     Tc = False, 1, "tC"
     Ktc = False, 1e3, "KtC"
@@ -19,7 +20,15 @@ class Units(Enum):
 
 
 def find_units(units_str):
+    """Finds the unit from that's represented by the provided string.
+
+    Args:
+        units_str: String containing valid unit.
+
+    Returns:
+        The associated tuple from `Unit` (or Tc if the string is not found).
+    """
     try:
         return Units[units_str]
-    except:
+    except KeyError:
         return Units.Tc
