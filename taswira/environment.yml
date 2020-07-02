@@ -16,3 +16,4 @@ dependencies:
     - autopep8>=1.5.3
     - flit>=2.3.0
     - dash==1.13.3
+    - dash-leaflet==0.0.19
