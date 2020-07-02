@@ -1,28 +1,27 @@
 """Taswira's CLI"""
 import argparse
+import os
 import tempfile
 
 import terracotta as tc
 from terracotta.server.app import app as tc_app
 
 from ..app import get_app
-
 from . import arg_types, update_config
 from .helpers import get_free_port
 from .ingestion import ingest
 
 
 def start_servers(dbpath, port):
-    """Load given DB and start a Terracotta server.
+    """Load given DB and start a Terracotta and Dash server.
 
-    Arguments:
-
+    Args:
         dbpath: Path to a Terracota-generated DB.
         port: Port number for Terracotta server.
     """
     tc.update_settings(DRIVER_PATH=dbpath, DRIVER_PROVIDER='sqlite')
     app = get_app(tc_app)
-    app.run_server(port=port, threaded=False)
+    app.run_server(port=port, threaded=False, debug='DEBUG' in os.environ)
 
 
 def console():
