@@ -1,6 +1,5 @@
 """Utilites"""
 import socket
-from contextlib import closing
 
 
 def get_free_port():
@@ -8,7 +7,10 @@ def get_free_port():
 
     https://stackoverflow.com/a/1365284
     """
-    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
-        sock.bind(("", 0))
-        sock.listen(1)
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        try:
+            sock.bind(("", 5000))
+        except OSError:
+            sock.bind(("", 0))
+            sock.listen(1)
         return sock.getsockname()[1]
