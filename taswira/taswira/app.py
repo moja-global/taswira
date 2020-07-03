@@ -1,17 +1,22 @@
 """The Dash-based front-end"""
 import dash
+import dash_core_components as dcc
 import dash_html_components as html
 import dash_leaflet as dl
 import terracotta as tc
+from dash.dependencies import Input, Output
 
 
 def _get_data():
     driver = tc.get_driver(tc.get_settings().DRIVER_PATH)
+    data = {}
     with driver.connect():
-        return [
-            dict(title=k[0], year=k[1], **driver.get_metadata(k))
-            for k, v in driver.get_datasets().items()
-        ]
+        for k in driver.get_datasets():
+            title, year = k
+            if not title in data:
+                data[title] = {}
+            data[title][year] = driver.get_metadata(k)
+    return data
 
 
 def format_bounds(bounds):
@@ -26,15 +31,6 @@ def format_bounds(bounds):
     return [[bounds[1], bounds[0]], [bounds[3], bounds[2]]]
 
 
-def _make_map(tile_url, bounds):
-    style = {'width': '500px', 'height': '500px'}
-
-    return dl.Map([dl.TileLayer(), dl.TileLayer(url=tile_url)],
-                  id='main-map',
-                  bounds=bounds,
-                  style=style)
-
-
 def get_app(tc_app):
     """Create a new Dash instance with a Terracotta instance embedded in it.
 
@@ -44,12 +40,44 @@ def get_app(tc_app):
     Returns:
         A Flask instance of a Dash app.
     """
+    # pylint: disable=unused-variable
     data = _get_data()
     app = dash.Dash(__name__, server=tc_app, routes_pathname_prefix='/dash/')
-    xyz = '{z}/{x}/{y}'
-    main_map = _make_map(
-        f'/singleband/{data[0]["title"]}/{data[0]["year"]}/{xyz}.png',
-        format_bounds(data[0]['bounds']))
-    app.layout = html.Div(main_map)
+    options = [{'label': k, 'value': k} for k in list(data)]
+    app.layout = html.Div([
+        dcc.Dropdown(id='title-dropdown',
+                     clearable=False,
+                     options=options,
+                     value=options[0]['value']),
+        dcc.Slider(id='year-slider', step=None, value=0),
+        html.Div(id='main-map'),
+    ])
+
+    @app.callback(
+        Output('main-map', 'children'),
+        [Input('title-dropdown', 'value'),
+         Input('year-slider', 'value')])
+    def update_map(title, year):
+        bounds = format_bounds(data[title][str(year)]['bounds'])
+        style = {'width': '500px', 'height': '500px'}
+        xyz = '{z}/{x}/{y}'
+        leafmap = dl.Map([
+            dl.TileLayer(),
+            dl.TileLayer(url=f'/singleband/{title}/{year}/{xyz}.png')
+        ],
+                         bounds=bounds,
+                         style=style)
+        return leafmap
+
+    @app.callback([
+        Output('year-slider', 'marks'),
+        Output('year-slider', 'min'),
+        Output('year-slider', 'max'),
+        Output('year-slider', 'value'),
+    ], [Input('title-dropdown', 'value')])
+    def update_slider(title):
+        marks = {int(k): k for k in data[title].keys()}
+        value = min(marks.keys())
+        return marks, value, max(marks.keys()), value
 
     return app
