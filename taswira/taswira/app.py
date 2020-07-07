@@ -3,6 +3,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_leaflet as dl
+import plotly.graph_objects as go
 import terracotta as tc
 from dash.dependencies import Input, Output
 
@@ -51,6 +52,7 @@ def get_app(tc_app):
                      value=options[0]['value']),
         dcc.Slider(id='year-slider', step=None, value=0),
         html.Div(id='main-map'),
+        dcc.Graph(id='indicator-change-graph')
     ])
 
     @app.callback(
@@ -79,5 +81,17 @@ def get_app(tc_app):
         marks = {int(k): k for k in data[title].keys()}
         value = min(marks.keys())
         return marks, value, max(marks.keys()), value
+
+    @app.callback(Output('indicator-change-graph', 'figure'),
+                  [Input('title-dropdown', 'value')])
+    def update_graph(title):
+        fig = go.Figure()
+        x_marks = []
+        y_margs = []
+        for year, meta in data[title].items():
+            x_marks.append(year)
+            y_margs.append(meta['metadata'][title])
+        fig.add_trace(go.Scatter(x=x_marks, y=y_margs))
+        return fig
 
     return app
