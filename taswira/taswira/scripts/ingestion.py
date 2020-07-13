@@ -9,45 +9,12 @@ from . import get_config
 from .metadata import get_metadata
 
 DB_NAME = 'terracotta.sqlite'
-GCBM_RASTER_NAME_PATTERN = r'(?P<title>\w+)_(?P<year>\d{4}).tiff'
+GCBM_RASTER_NAME_PATTERN = r'.*_(?P<year>\d{4}).tiff'
 GCBM_RASTER_KEYS = ('title', 'year')
 GCBM_RASTER_KEYS_DESCRIPTION = {
-    'title': 'Title of raster.',
-    'year': 'Year of raster.',
+    'title': 'Name of indicator',
+    'year': 'Year of raster data',
 }
-
-
-def _get_raster_db_rows(raster_files, indicator, indicator_metadata):
-    """Generate rows for a Terracotta raster DB.
-
-    Args:
-        raster_files: List of raster file paths.
-        indicator: Name of indicator.
-        indicator_metadata: Dict of year-wise values of `indicator`.
-
-    Returns:
-        List of tuples (keys, filepath, metadata) that can be unpacked and
-        then passed to `driver.insert()`.
-    """
-    rows = []
-
-    for raster_path in raster_files:
-        raster_filename = os.path.basename(raster_path)
-
-        match = re.match(GCBM_RASTER_NAME_PATTERN, raster_filename)
-        if match is None:
-            raise ValueError(
-                f'Input file {raster_filename} does not match raster pattern')
-
-        keys = _, year = match.groups()
-        metadata = {indicator: str(indicator_metadata[year])}
-        rows.append({
-            'keys': keys,
-            'filepath': raster_path,
-            'metadata': metadata
-        })
-
-    return rows
 
 
 def ingest(rasterdir, db_results, outputdir):
@@ -71,6 +38,7 @@ def ingest(rasterdir, db_results, outputdir):
             raster_files = glob.glob(rasterdir + os.sep +
                                      config['file_pattern'])
             indicator = config['database_indicator']
+            title = config.get('title', indicator)
             for raster_path in raster_files:
                 raster_filename = os.path.basename(raster_path)
 
@@ -80,10 +48,11 @@ def ingest(rasterdir, db_results, outputdir):
                         f'Input file {raster_filename} does not match raster pattern'
                     )
 
-                keys = _, year = match.groups()
+                year = match.group('year')
+                keys = (title, year)
                 computed_metadata = driver.compute_metadata(
                     raster_path,
-                    extra_metadata={indicator: str(metadata[indicator][year])})
+                    extra_metadata={title: str(metadata[indicator][year])})
                 driver.insert(keys, raster_path, metadata=computed_metadata)
 
     return driver.path
