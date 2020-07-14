@@ -44,13 +44,13 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 ## Maintainers Reviewers Ambassadors Coaches
 
 The following people are Maintainers Reviewers Ambassadors or Coaches  
-l<table><tr>
+<table><tr>
  
 <td align="center"><a href="https://abhineet.tk"><img src="https://avatars1.githubusercontent.com/u/11965776?v=4" width="100px;" alt=""/><br /><sub><b>Abhineet Tamrakar</b></sub></a><br /><a href="https://github.com/moja-global/GSoC.FLINT.Visualisation_Tool/commits?author=abhineet97" title="Documentation">📖</a> <a href="https://github.com/moja-global/GSoC.FLINT.Visualisation_Tool/commits?author=abhineet97" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/kaskou"><img src="https://avatars1.githubusercontent.com/u/8544371?v=4" width="100px;" alt=""/><br /><sub><b>kaushik surya sangem</b></sub></a><br /><a href="https://github.com/moja-global/GSoC.FLINT.Visualisation_Tool/pulls?q=is%3Apr+reviewed-by%3Akaskou" title="Reviewed Pull Requests">👀</a></td>
 </tr>
 </table>
-7
+
 **Maintainers** review and accept proposed changes  
 **Reviewers** check proposed changes before they go to the Maintainers  
 **Ambassadors** are available to provide training related to this repository  
