@@ -22,11 +22,6 @@ def _get_data():
     return data
 
 
-def rgb_to_hex(r, g, b):  # pylint: disable=invalid-name
-    """Converts RGB value to HTML hexcode."""
-    return f'#{int(r):02X}{int(g):02X}{int(b):02X}'
-
-
 def format_bounds(bounds):
     """Formats tuple of bounds for Leaflet.
 
@@ -111,12 +106,10 @@ def get_app(tc_app):
         colormap = raster_data['metadata']['colormap']
 
         ctg = []
-        colorscale = []
         for cmap in get_colormap(stretch_range=raster_data['range'],
                                  colormap=colormap,
                                  num_values=6):
             ctg.append(f'{cmap["value"]:.3f}+')
-            colorscale.append(rgb_to_hex(*cmap['rgb']))
 
         colorbar = dlx.categorical_colorbar(categories=ctg,
                                             colorscale=colormap,
