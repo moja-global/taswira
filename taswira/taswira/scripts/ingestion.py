@@ -5,6 +5,7 @@ import re
 
 import terracotta as tc
 
+from ..units import find_units
 from . import get_config
 from .metadata import get_metadata
 
@@ -37,8 +38,7 @@ def ingest(rasterdir, db_results, outputdir):
         for config in get_config():
             raster_files = glob.glob(rasterdir + os.sep +
                                      config['file_pattern'])
-            indicator = config['database_indicator']
-            title = config.get('title', indicator)
+            title = config.get('title', config['database_indicator'])
             for raster_path in raster_files:
                 raster_filename = os.path.basename(raster_path)
 
@@ -50,11 +50,13 @@ def ingest(rasterdir, db_results, outputdir):
 
                 year = match.group('year')
                 keys = (title, year)
+                unit = find_units(config.get('graph_units'))
                 computed_metadata = driver.compute_metadata(
                     raster_path,
                     extra_metadata={
                         'value': str(metadata[title][year]),
-                        'colormap': config.get('palette').lower()
+                        'colormap': config.get('palette').lower(),
+                        'unit': unit.value[2]
                     })
                 driver.insert(keys, raster_path, metadata=computed_metadata)
 

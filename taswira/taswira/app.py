@@ -160,9 +160,15 @@ def get_app(tc_app):
             x_marks.append(year)
             y_margs.append(meta['metadata']['value'])
         fig.add_trace(go.Scatter(x=x_marks, y=y_margs, mode='lines+markers'))
+
+        unit = ''
+        for _, meta in data[title].items():
+            unit = meta['metadata']['unit']
+            break
+
         fig.update_layout(autosize=False,
                           xaxis_title='Year',
-                          yaxis_title=title,
+                          yaxis_title=f'{title} ({unit})',
                           xaxis_type='category',
                           height=150,
                           margin=dict(t=10, b=0))
