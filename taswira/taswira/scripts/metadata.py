@@ -65,5 +65,6 @@ def get_metadata(db_results):
     conn = sqlite3.connect(db_results)
     for config in get_config():
         indicator = config['database_indicator']
-        metadata[indicator] = _get_annual_result(conn, indicator)
+        title = config.get('title', indicator)
+        metadata[title] = _get_annual_result(conn, indicator)
     return metadata

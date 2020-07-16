@@ -3,9 +3,11 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_leaflet as dl
+import dash_leaflet.express as dlx
 import plotly.graph_objects as go
 import terracotta as tc
 from dash.dependencies import Input, Output
+from terracotta.handlers.colormap import colormap as get_colormap
 
 
 def _get_data():
@@ -18,6 +20,10 @@ def _get_data():
                 data[title] = {}
             data[title][year] = driver.get_metadata(k)
     return data
+
+
+def rgb_to_hex(r, g, b):
+    return f'#{int(r):02X}{int(g):02X}{int(b):02X}'
 
 
 def format_bounds(bounds):
@@ -96,11 +102,30 @@ def get_app(tc_app):
         [Input('title-dropdown', 'value'),
          Input('year-slider', 'value')])
     def update_map(title, year):
-        bounds = format_bounds(data[title][str(year)]['bounds'])
+        d = data[title][str(year)]
+        bounds = format_bounds(d['bounds'])
+        colormap = d['metadata']['colormap']
+
+        ctg = []
+        colorscale = []
+        for cmap in get_colormap(stretch_range=d['range'],
+                                 colormap=colormap,
+                                 num_values=5):
+            ctg.append(f'{cmap["value"]:.4}+')
+            colorscale.append(rgb_to_hex(*cmap['rgb']))
+
+        colorbar = dlx.categorical_colorbar(categories=ctg,
+                                            colorscale=colorscale,
+                                            width=300,
+                                            height=30,
+                                            position="topleft")
+
         xyz = '{z}/{x}/{y}'
         leafmap = dl.Map([
             dl.TileLayer(),
-            dl.TileLayer(url=f'/singleband/{title}/{year}/{xyz}.png')
+            dl.TileLayer(
+                url=f'/singleband/{title}/{year}/{xyz}.png?colormap={colormap}'
+            ), colorbar
         ],
                          bounds=bounds)
         return leafmap
@@ -128,7 +153,7 @@ def get_app(tc_app):
         y_margs = []
         for year, meta in data[title].items():
             x_marks.append(year)
-            y_margs.append(meta['metadata'][title])
+            y_margs.append(meta['metadata']['value'])
         fig.add_trace(go.Scatter(x=x_marks, y=y_margs, mode='lines+markers'))
         fig.update_layout(autosize=False,
                           xaxis_title='Year',
