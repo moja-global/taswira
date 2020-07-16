@@ -85,7 +85,12 @@ def get_app(tc_app):
                     'height': '0',
                     'margin-right': '8em'
                 }),
-            dcc.Graph(id='indicator-change-graph', style={'width': '100%'})
+            dcc.Graph(id='indicator-change-graph',
+                      responsive=True,
+                      style={
+                          'width': '100%',
+                          'height': '30%'
+                      })
         ],
         style={
             'position': 'absolute',
