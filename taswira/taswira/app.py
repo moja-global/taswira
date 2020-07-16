@@ -3,9 +3,11 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_leaflet as dl
+import dash_leaflet.express as dlx
 import plotly.graph_objects as go
 import terracotta as tc
 from dash.dependencies import Input, Output
+from terracotta.handlers.colormap import colormap as get_colormap
 
 
 def _get_data():
@@ -44,6 +46,7 @@ def get_app(tc_app):
     # pylint: disable=unused-variable
     data = _get_data()
     app = dash.Dash(__name__, server=tc_app, routes_pathname_prefix='/dash/')
+    app.title = 'Taswira'
     options = [{'label': k, 'value': k} for k in list(data)]
     app.layout = html.Div(
         [
@@ -53,7 +56,7 @@ def get_app(tc_app):
                          value=options[0]['value'],
                          style={
                              'position': 'relative',
-                             'top': '10px',
+                             'top': '5px',
                              'z-index': '500',
                              'height': '0',
                              'max-width': '200px',
@@ -76,11 +79,18 @@ def get_app(tc_app):
                 )],
                 style={
                     'position': 'relative',
-                    'top': '-75px',
+                    'top': '-50px',
+                    'left': '20px',
                     'z-index': '500',
-                    'height': '0'
+                    'height': '0',
+                    'margin-right': '8em'
                 }),
-            dcc.Graph(id='indicator-change-graph', style={'width': '100%'})
+            dcc.Graph(id='indicator-change-graph',
+                      responsive=True,
+                      style={
+                          'width': '100%',
+                          'height': '30%'
+                      })
         ],
         style={
             'position': 'absolute',
@@ -96,11 +106,31 @@ def get_app(tc_app):
         [Input('title-dropdown', 'value'),
          Input('year-slider', 'value')])
     def update_map(title, year):
-        bounds = format_bounds(data[title][str(year)]['bounds'])
+        raster_data = data[title][str(year)]
+        bounds = format_bounds(raster_data['bounds'])
+        colormap = raster_data['metadata']['colormap']
+
+        ctg = []
+        for cmap in get_colormap(stretch_range=raster_data['range'],
+                                 colormap=colormap,
+                                 num_values=6):
+            ctg.append(f'{cmap["value"]:.3f}+')
+
+        colorbar = dlx.categorical_colorbar(categories=ctg,
+                                            colorscale=colormap,
+                                            width=20,
+                                            height=100,
+                                            position="bottomright")
+
         xyz = '{z}/{x}/{y}'
         leafmap = dl.Map([
-            dl.TileLayer(),
-            dl.TileLayer(url=f'/singleband/{title}/{year}/{xyz}.png')
+            dl.TileLayer(
+                attribution=
+                '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            ),
+            dl.TileLayer(
+                url=f'/singleband/{title}/{year}/{xyz}.png?colormap={colormap}'
+            ), colorbar
         ],
                          bounds=bounds)
         return leafmap
@@ -128,11 +158,17 @@ def get_app(tc_app):
         y_margs = []
         for year, meta in data[title].items():
             x_marks.append(year)
-            y_margs.append(meta['metadata'][title])
+            y_margs.append(meta['metadata']['value'])
         fig.add_trace(go.Scatter(x=x_marks, y=y_margs, mode='lines+markers'))
+
+        unit = ''
+        for _, meta in data[title].items():
+            unit = meta['metadata']['unit']
+            break
+
         fig.update_layout(autosize=False,
                           xaxis_title='Year',
-                          yaxis_title=title,
+                          yaxis_title=f'{title} ({unit})',
                           xaxis_type='category',
                           height=150,
                           margin=dict(t=10, b=0))
