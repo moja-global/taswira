@@ -22,7 +22,8 @@ def _get_data():
     return data
 
 
-def rgb_to_hex(r, g, b):
+def rgb_to_hex(r, g, b):  # pylint: disable=invalid-name
+    """Converts RGB value to HTML hexcode."""
     return f'#{int(r):02X}{int(g):02X}{int(b):02X}'
 
 
@@ -59,7 +60,7 @@ def get_app(tc_app):
                          value=options[0]['value'],
                          style={
                              'position': 'relative',
-                             'top': '10px',
+                             'top': '5px',
                              'z-index': '500',
                              'height': '0',
                              'max-width': '200px',
@@ -82,9 +83,11 @@ def get_app(tc_app):
                 )],
                 style={
                     'position': 'relative',
-                    'top': '-75px',
+                    'top': '-50px',
+                    'left': '20px',
                     'z-index': '500',
-                    'height': '0'
+                    'height': '0',
+                    'margin-right': '8em'
                 }),
             dcc.Graph(id='indicator-change-graph', style={'width': '100%'})
         ],
@@ -102,23 +105,23 @@ def get_app(tc_app):
         [Input('title-dropdown', 'value'),
          Input('year-slider', 'value')])
     def update_map(title, year):
-        d = data[title][str(year)]
-        bounds = format_bounds(d['bounds'])
-        colormap = d['metadata']['colormap']
+        raster_data = data[title][str(year)]
+        bounds = format_bounds(raster_data['bounds'])
+        colormap = raster_data['metadata']['colormap']
 
         ctg = []
         colorscale = []
-        for cmap in get_colormap(stretch_range=d['range'],
+        for cmap in get_colormap(stretch_range=raster_data['range'],
                                  colormap=colormap,
-                                 num_values=5):
-            ctg.append(f'{cmap["value"]:.4}+')
+                                 num_values=6):
+            ctg.append(f'{cmap["value"]:.3f}+')
             colorscale.append(rgb_to_hex(*cmap['rgb']))
 
         colorbar = dlx.categorical_colorbar(categories=ctg,
-                                            colorscale=colorscale,
-                                            width=300,
-                                            height=30,
-                                            position="topleft")
+                                            colorscale=colormap,
+                                            width=20,
+                                            height=100,
+                                            position="bottomright")
 
         xyz = '{z}/{x}/{y}'
         leafmap = dl.Map([
