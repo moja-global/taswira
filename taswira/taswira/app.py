@@ -124,7 +124,10 @@ def get_app(tc_app):
 
         xyz = '{z}/{x}/{y}'
         leafmap = dl.Map([
-            dl.TileLayer(),
+            dl.TileLayer(
+                attribution=
+                '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            ),
             dl.TileLayer(
                 url=f'/singleband/{title}/{year}/{xyz}.png?colormap={colormap}'
             ), colorbar
