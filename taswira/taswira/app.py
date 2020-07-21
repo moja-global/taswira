@@ -45,7 +45,7 @@ def get_app(tc_app):
     """
     # pylint: disable=unused-variable
     data = _get_data()
-    app = dash.Dash(__name__, server=tc_app, routes_pathname_prefix='/dash/')
+    app = dash.Dash(__name__, server=tc_app)
     app.title = 'Taswira'
     options = [{'label': k, 'value': k} for k in list(data)]
     app.layout = html.Div(
