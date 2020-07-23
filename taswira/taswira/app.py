@@ -9,6 +9,10 @@ import terracotta as tc
 from dash.dependencies import Input, Output, State
 from terracotta.handlers.colormap import colormap as get_colormap
 
+BASE_MAP_ATTRIBUTION = ('© <a href="https://www.openstreetmap.org/copyright">'
+                        'OpenStreetMap</a> contributors')
+N_COLORBAR_ROWS = 6
+
 
 def _get_data():
     driver = tc.get_driver(tc.get_settings().DRIVER_PATH)
@@ -22,6 +26,16 @@ def _get_data():
     return data
 
 
+def get_element_after(current_element, iterator):
+    """Returns the element that comes after the given element of the given
+    iterator.
+    """
+    for element in iterator:
+        if element == current_element:
+            break
+    return next(iterator, None)
+
+
 def format_bounds(bounds):
     """Formats tuple of bounds for Leaflet.
 
@@ -32,6 +46,30 @@ def format_bounds(bounds):
         Nested list as required by Leaflet.
     """
     return [[bounds[1], bounds[0]], [bounds[3], bounds[2]]]
+
+
+def get_colorbar(stretch_range, colormap):
+    """Creates a colorbar component for a dash_leaflet.Map.
+
+    Args:
+        stretch_range: list of lower and upper limit for colorbar.
+        colormap: string of color palette (like "virdis", "greens", etc.)
+
+    Returns:
+        dash_leaflet.Colobar component.
+    """
+    ctg = [
+        f'{cmap["value"]:.3f}+'
+        for cmap in get_colormap(stretch_range=stretch_range,
+                                 colormap=colormap,
+                                 num_values=N_COLORBAR_ROWS)
+    ]
+
+    return dlx.categorical_colorbar(categories=ctg,
+                                    colorscale=colormap,
+                                    width=20,
+                                    height=100,
+                                    position="bottomright")
 
 
 def get_app(tc_app):
@@ -57,13 +95,13 @@ def get_app(tc_app):
                          style={
                              'position': 'relative',
                              'top': '5px',
-                             'z-index': '500',
+                             'zIndex': '500',
                              'height': '0',
-                             'max-width': '200px',
-                             'margin-left': 'auto',
-                             'margin-right': '10px'
+                             'maxWidth': '200px',
+                             'marginLeft': 'auto',
+                             'marginRight': '10px'
                          }),
-            html.Div(id='main-map',
+            html.Div(id='main-map-div',
                      style={
                          'position': 'relative',
                          'width': '100%',
@@ -80,7 +118,7 @@ def get_app(tc_app):
                     'position': 'relative',
                     'top': '-50px',
                     'left': '10px',
-                    'z-index': '500',
+                    'zIndex': '500',
                     'height': '0',
                 },
                 id="animation-control"),
@@ -94,9 +132,9 @@ def get_app(tc_app):
                     'position': 'relative',
                     'top': '-50px',
                     'left': '60px',
-                    'z-index': '500',
+                    'zIndex': '500',
                     'height': '0',
-                    'margin-right': '9em'
+                    'marginRight': '9em'
                 },
                 id='year-slider-div'),
             dcc.Graph(id='indicator-change-graph',
@@ -112,11 +150,11 @@ def get_app(tc_app):
             'height': '100%',
             'top': '0',
             'left': '0',
-            'font-family': 'sans-serif'
+            'fontFamily': 'sans-serif'
         })
 
     @app.callback(
-        Output('main-map', 'children'),
+        Output('main-map-div', 'children'),
         [Input('title-dropdown', 'value'),
          Input('year-slider', 'value')])
     def update_map(title, year):
@@ -124,30 +162,23 @@ def get_app(tc_app):
         bounds = format_bounds(raster_data['bounds'])
         colormap = raster_data['metadata']['colormap']
 
-        ctg = []
-        for cmap in get_colormap(stretch_range=raster_data['range'],
-                                 colormap=colormap,
-                                 num_values=6):
-            ctg.append(f'{cmap["value"]:.3f}+')
-
-        colorbar = dlx.categorical_colorbar(categories=ctg,
-                                            colorscale=colormap,
-                                            width=20,
-                                            height=100,
-                                            position="bottomright")
+        ranges = [data[title][y]['range'] for y in data[title].keys()]
+        lowers, uppers = list(zip(*ranges))
+        stretch_range = [min(lowers), max(uppers)]
+        colorbar = get_colorbar(stretch_range, colormap)
 
         xyz = '{z}/{x}/{y}'
-        leafmap = dl.Map([
-            dl.TileLayer(
-                attribution=
-                '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            ),
-            dl.TileLayer(
-                url=f'/singleband/{title}/{year}/{xyz}.png?colormap={colormap}'
-            ), colorbar
-        ],
-                         bounds=bounds)
-        return leafmap
+        base_layer = dl.TileLayer(attribution=BASE_MAP_ATTRIBUTION)
+        raster_layer = dl.TileLayer(
+            url=f'/singleband/{title}/{year}/{xyz}.png?colormap={colormap}')
+
+        next_year = get_element_after(str(year), iter(data[title].keys()))
+        next_raster_layer = dl.TileLayer(
+            url=f'/singleband/{title}/{next_year}/{xyz}.png?colormap={colormap}'
+        )
+
+        return dl.Map([base_layer, next_raster_layer, raster_layer, colorbar],
+                      bounds=bounds)
 
     @app.callback([
         Output('year-slider', 'marks'),
@@ -155,7 +186,7 @@ def get_app(tc_app):
         Output('year-slider', 'max'),
     ], [Input('title-dropdown', 'value')])
     def update_slider(title):
-        mark_style = {'color': '#fff', 'text-shadow': '1px 1px 2px #000'}
+        mark_style = {'color': '#fff', 'textShadow': '1px 1px 2px #000'}
         marks = {
             int(k): dict(label=k, style=mark_style)
             for k in data[title].keys()
@@ -177,13 +208,10 @@ def get_app(tc_app):
             trigger = ctx.triggered[0]['prop_id'].split('.')[0]
             trigger_value = ctx.triggered[0]['value']
             if trigger == 'animation-interval' and trigger_value:
-                keys = iter(marks.keys())
-                for mark in keys:
-                    if mark == str(current_value):
-                        try:
-                            return int(next(keys))
-                        except StopIteration:
-                            pass
+                new_value = get_element_after(str(current_value),
+                                              iter(marks.keys()))
+                if new_value is not None:
+                    return int(new_value)
             elif current_value:
                 return current_value
 
