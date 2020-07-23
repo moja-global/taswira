@@ -57,11 +57,11 @@ def get_app(tc_app):
                          style={
                              'position': 'relative',
                              'top': '5px',
-                             'z-index': '500',
+                             'zIndex': '500',
                              'height': '0',
-                             'max-width': '200px',
-                             'margin-left': 'auto',
-                             'margin-right': '10px'
+                             'maxWidth': '200px',
+                             'marginLeft': 'auto',
+                             'marginRight': '10px'
                          }),
             html.Div(id='main-map',
                      style={
@@ -80,7 +80,7 @@ def get_app(tc_app):
                     'position': 'relative',
                     'top': '-50px',
                     'left': '10px',
-                    'z-index': '500',
+                    'zIndex': '500',
                     'height': '0',
                 },
                 id="animation-control"),
@@ -94,9 +94,9 @@ def get_app(tc_app):
                     'position': 'relative',
                     'top': '-50px',
                     'left': '60px',
-                    'z-index': '500',
+                    'zIndex': '500',
                     'height': '0',
-                    'margin-right': '9em'
+                    'marginRight': '9em'
                 },
                 id='year-slider-div'),
             dcc.Graph(id='indicator-change-graph',
@@ -112,7 +112,7 @@ def get_app(tc_app):
             'height': '100%',
             'top': '0',
             'left': '0',
-            'font-family': 'sans-serif'
+            'fontFamily': 'sans-serif'
         })
 
     @app.callback(
@@ -155,7 +155,7 @@ def get_app(tc_app):
         Output('year-slider', 'max'),
     ], [Input('title-dropdown', 'value')])
     def update_slider(title):
-        mark_style = {'color': '#fff', 'text-shadow': '1px 1px 2px #000'}
+        mark_style = {'color': '#fff', 'textShadow': '1px 1px 2px #000'}
         marks = {
             int(k): dict(label=k, style=mark_style)
             for k in data[title].keys()
