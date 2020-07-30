@@ -24,8 +24,10 @@ jobs:
         environment-file: taswira/environment.yml
         auto-activate-base: false
     - name: Install Taswira
-      run: |
-        flit install
+      shell: bash -l {0}
+      run: python -m flit install
+      working-directory: ./taswira
     - name: Test with pytest
-      run: |
-        pytest
+      shell: bash -l {0}
+      run: pytest
+      working-directory: ./taswira
