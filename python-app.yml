@@ -1,0 +1,30 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Python application
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Miniconda
+      uses: goanpeca/setup-miniconda@v1
+      with:
+        activate-environment: taswira
+        environment-file: taswira/environment.yml
+        auto-activate-base: false
+    - name: Install Taswira
+      run: |
+        flit install
+    - name: Test with pytest
+      run: |
+        pytest
