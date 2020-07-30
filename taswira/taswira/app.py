@@ -88,6 +88,7 @@ def get_app(tc_app):
     options = [{'label': k, 'value': k} for k in list(data)]
     app.layout = html.Div(
         [
+            dcc.Store(id='raster-layers-store'),
             dcc.Dropdown(id='title-dropdown',
                          clearable=False,
                          options=options,
@@ -101,7 +102,13 @@ def get_app(tc_app):
                              'marginLeft': 'auto',
                              'marginRight': '10px'
                          }),
-            html.Div(id='main-map-div',
+            html.Div(dl.Map([
+                dl.TileLayer(attribution=BASE_MAP_ATTRIBUTION),
+                dl.LayerGroup(id='raster-layers'),
+                dl.LayerGroup(id='colorbar-layer')
+            ],
+                            id='main-map'),
+                     id='main-map-div',
                      style={
                          'position': 'relative',
                          'width': '100%',
@@ -153,32 +160,47 @@ def get_app(tc_app):
             'fontFamily': 'sans-serif'
         })
 
-    @app.callback(
-        Output('main-map-div', 'children'),
-        [Input('title-dropdown', 'value'),
-         Input('year-slider', 'value')])
-    def update_map(title, year):
-        raster_data = data[title][str(year)]
-        bounds = format_bounds(raster_data['bounds'])
-        colormap = raster_data['metadata']['colormap']
+    app.clientside_callback(
+        """
+        function(year, layers){
+            return layers.map(l => {
+                console.log(typeof l.props.id, typeof year);
+                if (Number(l.props.id) === year)
+                    return {...l,props: {...l.props, opacity: 1.0}};
+                return l;
+            });
+        }
+        """, Output('raster-layers', 'children'),
+        [Input('year-slider', 'value'),
+         Input('raster-layers-store', 'data')],
+        [State('raster-layers', 'children')])
 
-        ranges = [data[title][y]['range'] for y in data[title].keys()]
+    @app.callback([
+        Output('raster-layers-store', 'data'),
+        Output('colorbar-layer', 'children'),
+        Output('main-map', 'bounds')
+    ], [Input('title-dropdown', 'value')])
+    def update_raster_layers_colobar_map_bounds(title):
+        ranges = [data[title][year]['range'] for year in data[title].keys()]
         lowers, uppers = list(zip(*ranges))
         stretch_range = [min(lowers), max(uppers)]
-        colorbar = get_colorbar(stretch_range, colormap)
 
         xyz = '{z}/{x}/{y}'
-        base_layer = dl.TileLayer(attribution=BASE_MAP_ATTRIBUTION)
-        raster_layer = dl.TileLayer(
-            url=f'/singleband/{title}/{year}/{xyz}.png?colormap={colormap}')
+        layers = []
+        for year in data[title]:
+            raster_data = data[title][year]
+            colormap = raster_data['metadata']['colormap']
+            bounds = format_bounds(raster_data['bounds'])
+            layers.append(
+                dl.TileLayer(
+                    url=
+                    f'/singleband/{title}/{year}/{xyz}.png?colormap={colormap}',
+                    opacity=0,
+                    id=year))
 
-        next_year = get_element_after(str(year), iter(data[title].keys()))
-        next_raster_layer = dl.TileLayer(
-            url=f'/singleband/{title}/{next_year}/{xyz}.png?colormap={colormap}'
-        )
+        colorbar = get_colorbar(stretch_range, colormap)
 
-        return dl.Map([base_layer, next_raster_layer, raster_layer, colorbar],
-                      bounds=bounds)
+        return layers, [colorbar], bounds
 
     @app.callback([
         Output('year-slider', 'marks'),
