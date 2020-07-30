@@ -1,5 +1,5 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+# This workflow will install Conda environment, run tests and lint with a single version of Python.
+# TODO: Remove `working-directory` options after migrating code to a taswira only repo.
 
 name: Python application
 
@@ -30,4 +30,8 @@ jobs:
     - name: Test with pytest
       shell: bash -l {0}
       run: pytest
+      working-directory: ./taswira
+    - name: Lint using pylint
+      shell: bash -l {0}
+      run: pylint taswira
       working-directory: ./taswira
