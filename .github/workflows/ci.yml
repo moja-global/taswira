@@ -1,0 +1,27 @@
+# This workflow will install Conda environment, run tests and lint with a single version of Python.
+# TODO: Remove `working-directory` options after migrating code to a taswira only repo.
+
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_BUILDKIT: "1"
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Lint using pylint
+      run: docker build . --target lint
+      working-directory: ./taswira
+    - name: Test using pytest
+      run: docker build . --target unit-test
+      working-directory: ./taswira
