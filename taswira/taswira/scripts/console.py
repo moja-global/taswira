@@ -20,7 +20,8 @@ def start_servers(dbpath, port):
         port: Port number for Terracotta server.
     """
     tc.update_settings(DRIVER_PATH=dbpath, DRIVER_PROVIDER='sqlite')
-    app = get_app(tc_app)
+    app = get_app()
+    app.init_app(tc_app)
     app.run_server(port=port, threaded=False, debug='DEBUG' in os.environ)
 
 

@@ -72,7 +72,7 @@ def get_colorbar(stretch_range, colormap):
                                     position="bottomright")
 
 
-def get_app(tc_app):
+def get_app():
     """Create a new Dash instance with a Terracotta instance embedded in it.
 
     Args:
@@ -83,7 +83,7 @@ def get_app(tc_app):
     """
     # pylint: disable=unused-variable
     data = _get_data()
-    app = dash.Dash(__name__, server=tc_app)
+    app = dash.Dash(__name__, server=False)
     app.title = 'Taswira'
     options = [{'label': k, 'value': k} for k in list(data)]
     app.layout = html.Div(
