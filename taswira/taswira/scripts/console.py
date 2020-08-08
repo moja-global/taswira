@@ -1,6 +1,8 @@
 """Taswira's CLI"""
 import argparse
 import os
+import signal
+import sys
 import tempfile
 
 import terracotta as tc
@@ -20,6 +22,11 @@ def start_servers(dbpath, port):
         dbpath: Path to a Terracota-generated DB.
         port: Port number for Terracotta server.
     """
+    def handler(signum, frame):  # pylint: disable=unused-argument
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, handler)
+
     tc.update_settings(DRIVER_PATH=dbpath, DRIVER_PROVIDER='sqlite')
     app = get_app()
     app.init_app(tc_app)
