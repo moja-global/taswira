@@ -1,10 +1,15 @@
 """Taswira's CLI"""
 import argparse
 import os
+import signal
+import sys
 import tempfile
+import threading
+import webbrowser
 
 import terracotta as tc
 from terracotta.server.app import app as tc_app
+from werkzeug.serving import run_simple
 
 from ..app import get_app
 from . import arg_types, update_config
@@ -19,9 +24,25 @@ def start_servers(dbpath, port):
         dbpath: Path to a Terracota-generated DB.
         port: Port number for Terracotta server.
     """
+    def handler(signum, frame):  # pylint: disable=unused-argument
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, handler)
+
     tc.update_settings(DRIVER_PATH=dbpath, DRIVER_PROVIDER='sqlite')
-    app = get_app(tc_app)
-    app.run_server(port=port, threaded=False, debug='DEBUG' in os.environ)
+    app = get_app()
+    app.init_app(tc_app)
+
+    def open_browser():
+        webbrowser.open(f'http://localhost:{port}')
+
+    threading.Timer(2, open_browser).start()
+
+    if 'DEBUG' in os.environ:
+        app.run_server(port=port, threaded=False, debug=True)
+    else:
+        print('Starting Taswira...')
+        run_simple('localhost', port, app.server)
 
 
 def console():

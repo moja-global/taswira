@@ -4,6 +4,7 @@ import os
 import re
 
 import terracotta as tc
+import tqdm
 
 from ..units import find_units
 from . import get_config
@@ -16,6 +17,16 @@ GCBM_RASTER_KEYS_DESCRIPTION = {
     'title': 'Name of indicator',
     'year': 'Year of raster data',
 }
+
+
+def _find_raster_year(raster_path):
+    raster_filename = os.path.basename(raster_path)
+    match = re.match(GCBM_RASTER_NAME_PATTERN, raster_filename)
+    if match is None:
+        raise ValueError(
+            f'Input file {raster_filename} does not match raster pattern')
+
+    return match.group('year')
 
 
 def ingest(rasterdir, db_results, outputdir):
@@ -34,30 +45,28 @@ def ingest(rasterdir, db_results, outputdir):
 
     metadata = get_metadata(db_results)
 
+    progress = tqdm.tqdm(get_config(), desc='Searching raster files')
+    raster_files = []
+    for config in progress:
+        raster_files += [
+            (f, config)
+            for f in glob.glob(rasterdir + os.sep + config['file_pattern'])
+        ]
+
     with driver.connect():
-        for config in get_config():
-            raster_files = glob.glob(rasterdir + os.sep +
-                                     config['file_pattern'])
+        progress = tqdm.tqdm(raster_files, desc='Processing raster files')
+        for raster_path, config in progress:
             title = config.get('title', config['database_indicator'])
-            for raster_path in raster_files:
-                raster_filename = os.path.basename(raster_path)
-
-                match = re.match(GCBM_RASTER_NAME_PATTERN, raster_filename)
-                if match is None:
-                    raise ValueError(
-                        f'Input file {raster_filename} does not match raster pattern'
-                    )
-
-                year = match.group('year')
-                keys = (title, year)
-                unit = find_units(config.get('graph_units'))
-                computed_metadata = driver.compute_metadata(
-                    raster_path,
-                    extra_metadata={
-                        'value': str(metadata[title][year]),
-                        'colormap': config.get('palette').lower(),
-                        'unit': unit.value[2]
-                    })
-                driver.insert(keys, raster_path, metadata=computed_metadata)
+            year = _find_raster_year(raster_path)
+            unit = find_units(config.get('graph_units'))
+            computed_metadata = driver.compute_metadata(
+                raster_path,
+                extra_metadata={
+                    'value': str(metadata[title][year]),
+                    'colormap': config.get('palette').lower(),
+                    'unit': unit.value[2]
+                })
+            keys = (title, year)
+            driver.insert(keys, raster_path, metadata=computed_metadata)
 
     return driver.path
