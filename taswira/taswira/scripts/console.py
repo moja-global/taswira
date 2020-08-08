@@ -4,6 +4,8 @@ import os
 import signal
 import sys
 import tempfile
+import threading
+import webbrowser
 
 import terracotta as tc
 from terracotta.server.app import app as tc_app
@@ -30,6 +32,11 @@ def start_servers(dbpath, port):
     tc.update_settings(DRIVER_PATH=dbpath, DRIVER_PROVIDER='sqlite')
     app = get_app()
     app.init_app(tc_app)
+
+    def open_browser():
+        webbrowser.open(f'http://localhost:{port}')
+
+    threading.Timer(2, open_browser).start()
 
     if 'DEBUG' in os.environ:
         app.run_server(port=port, threaded=False, debug=True)
