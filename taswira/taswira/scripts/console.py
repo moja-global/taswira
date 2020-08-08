@@ -5,6 +5,7 @@ import tempfile
 
 import terracotta as tc
 from terracotta.server.app import app as tc_app
+from werkzeug.serving import run_simple
 
 from ..app import get_app
 from . import arg_types, update_config
@@ -22,7 +23,12 @@ def start_servers(dbpath, port):
     tc.update_settings(DRIVER_PATH=dbpath, DRIVER_PROVIDER='sqlite')
     app = get_app()
     app.init_app(tc_app)
-    app.run_server(port=port, threaded=False, debug='DEBUG' in os.environ)
+
+    if 'DEBUG' in os.environ:
+        app.run_server(port=port, threaded=False, debug=True)
+    else:
+        print('Starting Taswira...')
+        run_simple('localhost', port, app.server)
 
 
 def console():
