@@ -62,8 +62,8 @@ def ingest(rasterdir, db_results, outputdir):
             computed_metadata = driver.compute_metadata(
                 raster_path,
                 extra_metadata={
-                    'value': str(metadata[title][year]),
                     'colormap': config.get('palette').lower(),
+                    'indicator_value': str(metadata[title][year]),
                     'unit': unit.value[2]
                 })
             keys = (title, year)
