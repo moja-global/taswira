@@ -21,28 +21,31 @@ def _get_simulation_years(conn):
 
 
 def _find_indicator_table(conn, indicator):
-    for table, value_col in RESULTS_TABLES.items():
-        if conn.execute(f"SELECT 1 FROM {table} WHERE indicator = ?",
-                        [indicator]).fetchone():
-            return table, value_col
+    hansen_jambi_table = {
+        'flux': 'flux_reporting_results',
+        'stock': 'stock_reporting_results'
+    }
+    return hansen_jambi_table[indicator], indicator
 
-    return None, None
+
+#    for table, value_col in RESULTS_TABLES.items():
+#        if conn.execute(f"SELECT 1 FROM {table} WHERE indicator = ?",
+#                        [indicator]).fetchone():
+#            return table, value_col
+#
+#    return None, None
 
 
 def _get_annual_result(conn, indicator, units=Units.Tc):
-    table, value_col = _find_indicator_table(conn, indicator)
+    table, value_col = ("flux_reporting_results", "flux")
     _, units_tc, _ = units.value
-    start_year, end_year = _get_simulation_years(conn)
+    start_year, end_year = (1999, 2020)
 
     db_result = conn.execute(f"""
-            SELECT years.year, COALESCE(SUM(i.{value_col}), 0) / {units_tc} AS value
-            FROM (SELECT DISTINCT year FROM v_age_indicators ORDER BY year) AS years
-            LEFT JOIN {table} i
-                ON years.year = i.year
-            WHERE i.indicator = '{indicator}'
-                AND (years.year BETWEEN {start_year} AND {end_year})
-            GROUP BY years.year
-            ORDER BY years.year
+            SELECT DISTINCT date_dimension_id_fk AS year, COALESCE(SUM({value_col}), 0) / {units_tc} AS value FROM {table}
+            WHERE (year BETWEEN {start_year} AND {end_year})
+            GROUP BY year
+            ORDER BY year
             """).fetchall()
 
     data = OrderedDict()
