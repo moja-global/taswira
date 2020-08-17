@@ -5,6 +5,7 @@ import signal
 import sys
 import tempfile
 import threading
+import warnings
 import webbrowser
 
 import terracotta as tc
@@ -14,7 +15,7 @@ from werkzeug.serving import run_simple
 from ..app import get_app
 from . import arg_types, update_config
 from .helpers import get_free_port
-from .ingestion import ingest
+from .ingestion import UnoptimizedRaster, ingest
 
 
 def start_servers(dbpath, port):
@@ -52,19 +53,40 @@ def console():
     parser.add_argument(
         "config",
         type=arg_types.indicator_file,
-        help="Path to JSON config file",
+        help="path to JSON config file",
     )
     parser.add_argument("spatial_results",
                         type=arg_types.spatial_results,
-                        help="Path to GCBM spatial output directory")
+                        help="path to GCBM spatial output directory")
     parser.add_argument("db_results",
                         type=arg_types.db_results,
-                        help="Path to compiled GCBM results database")
+                        help="path to compiled GCBM results database")
+    parser.add_argument("--allow-unoptimized",
+                        action="store_true",
+                        help="allow processing unoptimized raster files")
     args = parser.parse_args()
 
     update_config(args.config)
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        db = ingest(args.spatial_results, args.db_results, tmpdirname)  # pylint: disable=invalid-name
-        port = get_free_port()
-        start_servers(db, port)
+        try:
+            if args.allow_unoptimized:
+                warnings.simplefilter('ignore')  # Supress Terracotta warnings
+
+            dbpath = ingest(args.spatial_results, args.db_results, tmpdirname,
+                            args.allow_unoptimized)
+            port = get_free_port()
+            start_servers(dbpath, port)
+        except UnoptimizedRaster:
+            sys.exit("""\
+Found a raster file that is not a valid cloud-optimized GeoTIFFs. This tool
+wasn't designed to work with such files. You can try continuing anyway by
+passing the `--allow-unoptimized` flag but it's not recommended.
+
+For best experience, regenerate the raster files after configuring GCBM to use
+the following GDAL parameters:
+
+BIGTIFF=YES, TILED=YES, COMPRESS=ZSTD, ZSTD_LEVEL=1
+""")
+        except KeyboardInterrupt:
+            sys.exit("Raster loading was interrupted")

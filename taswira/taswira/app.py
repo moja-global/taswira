@@ -247,7 +247,7 @@ def get_app():
         y_margs = []
         for year, meta in data[title].items():
             x_marks.append(year)
-            y_margs.append(meta['metadata']['value'])
+            y_margs.append(meta['metadata']['indicator_value'])
         fig.add_trace(go.Scatter(x=x_marks, y=y_margs, mode='lines+markers'))
 
         unit = ''
