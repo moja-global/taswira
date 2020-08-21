@@ -8,7 +8,7 @@ RUN conda update conda \
 ENV CONDA_ENV=/opt/conda/envs/taswira
 ENV PATH="$CONDA_ENV/bin:$PATH"
 COPY . .
-RUN FLIT_ROOT_INSTALL=1 python -m flit install -s
+RUN python -m pip install -e .
 
 FROM base AS lint
 RUN python -m pylint taswira

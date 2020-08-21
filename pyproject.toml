@@ -1,11 +1,5 @@
 [build-system]
-requires = ["flit_core >=2,<4"]
-build-backend = "flit_core.buildapi"
-
-[tool.flit.metadata]
-module = "taswira"
-author = "Abhineet Tamrakar"
-author-email = "abhineet97@gmail.com"
-
-[tool.flit.scripts]
-taswira = "taswira:main"
+# These are the assumed default build requirements from pip:
+# https://pip.pypa.io/en/stable/reference/pip/#pep-517-and-518-support
+requires = ["setuptools>=40.8.0", "wheel"]
+build-backend = "setuptools.build_meta"
