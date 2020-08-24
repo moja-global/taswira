@@ -2,9 +2,9 @@
 
 > An interactive visualisation tool for GCBM.
 
-![Github All Contributors](https://img.shields.io/github/all-contributors/moja-global/GCBM.Visulisation_Tool)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/moja-global/GCBM.Visulisation_Tool/Continuous%20Integration)
-![GitHub](https://img.shields.io/github/license/moja-global/GCBM.Visulisation_Tool)
+![Github All Contributors](https://img.shields.io/github/all-contributors/moja-global/GCBM.Visualisation_Tool)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/moja-global/GCBM.Visualisation_Tool/Continuous%20Integration)
+![GitHub](https://img.shields.io/github/license/moja-global/GCBM.Visualisation_Tool)
 
 ![Screenshot of Taswira](screenshot.png)
 
@@ -21,8 +21,8 @@ Requires [Git] and [Miniconda] (or Anaconda) with Python 3.6 or newer.
 1. Clone the repository and `cd` into it:
 
 ```sh
-git clone https://github.com/moja-global/GCBM.Visulisation_Tool
-cd GCBM.Visulisation_Tool
+git clone https://github.com/moja-global/GCBM.Visualisation_Tool
+cd GCBM.Visualisation_Tool
 ```
 
 2. Create a conda environment and activate it:
