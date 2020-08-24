@@ -2,9 +2,9 @@
 
 > An interactive visualisation tool for GCBM.
 
-![Github All Contributors](https://img.shields.io/github/all-contributors/moja-global/GSoC.FLINT.Visualisation_Tool)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/moja-global/GSoC.FLINT.Visualisation_Tool/Continuous%20Integration)
-![GitHub](https://img.shields.io/github/license/moja-global/GSoC.FLINT.Visualisation_Tool)
+![Github All Contributors](https://img.shields.io/github/all-contributors/moja-global/GCBM.Visualisation_Tool)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/moja-global/GCBM.Visualisation_Tool/Continuous%20Integration)
+![GitHub](https://img.shields.io/github/license/moja-global/GCBM.Visualisation_Tool)
 
 ![Screenshot of Taswira](screenshot.png)
 
@@ -21,9 +21,8 @@ Requires [Git] and [Miniconda] (or Anaconda) with Python 3.6 or newer.
 1. Clone the repository and `cd` into it:
 
 ```sh
-git clone https://github.com/moja-global/GSoC.FLINT.Visualisation_Tool.git
-
-cd GSoC.FLINT.Visualisation_Tool
+git clone https://github.com/moja-global/GCBM.Visualisation_Tool
+cd GCBM.Visualisation_Tool
 ```
 
 2. Create a conda environment and activate it:
@@ -130,8 +129,8 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tr>
     <td align="center"><a href="http://moja.global"><img src="https://avatars1.githubusercontent.com/u/19564969?v=4" width="100px;" alt=""/><br /><sub><b>moja global</b></sub></a><br /><a href="#projectManagement-moja-global" title="Project Management">📆</a></td>
-    <td align="center"><a href="https://abhineet.tk"><img src="https://avatars1.githubusercontent.com/u/11965776?v=4" width="100px;" alt=""/><br /><sub><b>Abhineet Tamrakar</b></sub></a><br /><a href="https://github.com/moja-global/GSoC.FLINT.Visualisation_Tool/commits?author=abhineet97" title="Documentation">📖</a> <a href="https://github.com/moja-global/GSoC.FLINT.Visualisation_Tool/commits?author=abhineet97" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/kaskou"><img src="https://avatars1.githubusercontent.com/u/8544371?v=4" width="100px;" alt=""/><br /><sub><b>kaushik surya sangem</b></sub></a><br /><a href="https://github.com/moja-global/GSoC.FLINT.Visualisation_Tool/pulls?q=is%3Apr+reviewed-by%3Akaskou" title="Reviewed Pull Requests">👀</a></td>
+    <td align="center"><a href="https://abhineet.tk"><img src="https://avatars1.githubusercontent.com/u/11965776?v=4" width="100px;" alt=""/><br /><sub><b>Abhineet Tamrakar</b></sub></a><br /><a href="https://github.com/moja-global/GCBM.Visualisation_Tool/commits?author=abhineet97" title="Documentation">📖</a> <a href="https://github.com/moja-global/GCBM.Visualisation_Tool/commits?author=abhineet97" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/kaskou"><img src="https://avatars1.githubusercontent.com/u/8544371?v=4" width="100px;" alt=""/><br /><sub><b>kaushik surya sangem</b></sub></a><br /><a href="https://github.com/moja-global/GCBM.Visualisation_Tool/pulls?q=is%3Apr+reviewed-by%3Akaskou" title="Reviewed Pull Requests">👀</a></td>
     <td align="center"><a href="https://github.com/gmajan"><img src="https://avatars0.githubusercontent.com/u/8733319?v=4" width="100px;" alt=""/><br /><sub><b>Guy Janssen</b></sub></a><br /><a href="#projectManagement-gmajan" title="Project Management">📆</a></td>
   </tr>
 </table>
@@ -147,8 +146,8 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 The following people are Maintainers Reviewers Ambassadors or Coaches
 <table><tr>
 
-<td align="center"><a href="https://abhineet.tk"><img src="https://avatars1.githubusercontent.com/u/11965776?v=4" width="100px;" alt=""/><br /><sub><b>Abhineet Tamrakar</b></sub></a><br /><a href="https://github.com/moja-global/GSoC.FLINT.Visualisation_Tool/commits?author=abhineet97" title="Documentation">📖</a> <a href="https://github.com/moja-global/GSoC.FLINT.Visualisation_Tool/commits?author=abhineet97" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/kaskou"><img src="https://avatars1.githubusercontent.com/u/8544371?v=4" width="100px;" alt=""/><br /><sub><b>kaushik surya sangem</b></sub></a><br /><a href="https://github.com/moja-global/GSoC.FLINT.Visualisation_Tool/pulls?q=is%3Apr+reviewed-by%3Akaskou" title="Reviewed Pull Requests">👀</a></td>
+<td align="center"><a href="https://abhineet.tk"><img src="https://avatars1.githubusercontent.com/u/11965776?v=4" width="100px;" alt=""/><br /><sub><b>Abhineet Tamrakar</b></sub></a><br /><a href="https://github.com/moja-global/GCBM.Visualisation_Tool/commits?author=abhineet97" title="Documentation">📖</a> <a href="https://github.com/moja-global/GCBM.Visualisation_Tool/commits?author=abhineet97" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/kaskou"><img src="https://avatars1.githubusercontent.com/u/8544371?v=4" width="100px;" alt=""/><br /><sub><b>kaushik surya sangem</b></sub></a><br /><a href="https://github.com/moja-global/GCBM.Visualisation_Tool/pulls?q=is%3Apr+reviewed-by%3Akaskou" title="Reviewed Pull Requests">👀</a></td>
 </tr>
 </table>
 
