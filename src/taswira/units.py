@@ -20,7 +20,7 @@ class Units(Enum):
 
 
 def find_units(units_str):
-    """Finds the unit from that's represented by the provided string.
+    """Finds the unit that's represented by the provided string.
 
     Args:
         units_str: String containing valid unit.
