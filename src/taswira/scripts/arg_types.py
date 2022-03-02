@@ -39,7 +39,8 @@ def indicator_file(path):
             for key in INDICATOR_REQUIRED_KEYS:
                 if not key in indicator:
                     raise argparse.ArgumentTypeError(
-                        f"Required key `{key}` missing in config element {i}.")
+                        f"Required key `{key}` missing in config element {i}."
+                    )
 
         return config
 
