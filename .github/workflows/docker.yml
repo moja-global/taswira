@@ -2,6 +2,7 @@ name: Docker CI/CD
 
 on:
   schedule:
+    # Run this workflow at 00:00 on every Monday
     - cron: "0 0 * * MON"
   pull_request:
     branches: [ master ]
@@ -40,6 +41,7 @@ jobs:
       - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        # It will push the image to ghcr.io/moja-global/taswira:master on push
         with:
           images: ${{ env.REGISTRY }}/moja-global/taswira
 
@@ -47,8 +49,10 @@ jobs:
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
           context: .
+          # Prevent push to GHCR on pull requests
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # Implement Docker build caching for faster builds
           cache-from: type=gha
           cache-to: type=gha,mode=max

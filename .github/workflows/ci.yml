@@ -2,6 +2,7 @@ name: Continuous Integration
 
 on:
   schedule:
+    # Run this workflow at 00:00 on every Monday
     - cron: "0 0 * * MON"
   push:
     branches: [ master ]
@@ -10,8 +11,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  ci:
-    name: CI
+  build-test-taswira:
+    name: Build and Test Taswira
     runs-on: ubuntu-latest
 
     steps:
@@ -38,12 +39,14 @@ jobs:
         # Increase this value to reset cache if environment.yml has not changed
         CACHE_NUMBER: 0
       with:
+        # Cache the path where dependencies are installed with a key unique to the existing environment.yml
         path: /usr/local/miniconda/envs/taswira
         key:
           ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment.yml') }}
       id: envcache
         
     - name: Update Conda Environment
+      # Setup (or update) the environment for faster installs
       run: mamba env update -n taswira -f environment.yml
       
     - name: Install Python package
@@ -60,6 +63,7 @@ jobs:
       
     - name: Test
       shell: bash -l {0}
+      # Test the package
       run: |
         conda activate taswira
         python -m pytest
