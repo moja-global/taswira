@@ -49,7 +49,7 @@ setup(
         "dash ==1.13.3",
         "dash-leaflet ==0.0.19",
         "plotly ==4.8.2",
-        "Werkzeug ==1.0.1",
+        "Werkzeug ==2.2.3",
         "tqdm ==4.47.0",
     ],
     extra_requires={
