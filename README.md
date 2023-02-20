@@ -2,9 +2,9 @@
 
 > An interactive visualisation tool for GCBM.
 
-![Github All Contributors](https://img.shields.io/github/all-contributors/moja-global/GCBM.Visualisation_Tool)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/moja-global/GCBM.Visualisation_Tool/Continuous%20Integration)
-![GitHub](https://img.shields.io/github/license/moja-global/GCBM.Visualisation_Tool)
+![Github All Contributors](https://img.shields.io/github/all-contributors/moja-global/taswira)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/moja-global/taswira/ci.yml?branch=master)
+![GitHub](https://img.shields.io/github/license/moja-global/taswira)
 
 ![Screenshot of Taswira](screenshot.png)
 
