@@ -15,3 +15,5 @@ dependencies:
     - pylint>=2.5.2
     - dash==1.13.3
     - dash-leaflet==0.0.19
+    - markupsafe<2.1
+    - jinja2

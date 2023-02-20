@@ -1,24 +1,69 @@
-# This workflow will install Conda environment, run tests and lint with a single version of Python.
-
 name: Continuous Integration
 
 on:
+  schedule:
+    # Run this workflow at 00:00 on every Monday
+    - cron: "0 0 * * MON"
   push:
-    branches: [ main, master ]
+    branches: [ master ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ master ]
   workflow_dispatch:
 
 jobs:
-  ci:
-    name: CI
+  build-test-taswira:
+    name: Build and Test Taswira
     runs-on: ubuntu-latest
-    env:
-      DOCKER_BUILDKIT: "1"
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - name: Lint using pylint
-      run: docker build . --target lint
-    - name: Test using pytest
-      run: docker build . --target unit-test
+      
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+      
+    - name: Setup Conda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        python-version: 3.7
+        mamba-version: "*"
+        channels: conda-forge
+        channel-priority: true
+        activate-environment: taswira
+        
+    - name: Cache conda
+      uses: actions/cache@v2
+      env:
+        # Increase this value to reset cache if environment.yml has not changed
+        CACHE_NUMBER: 0
+      with:
+        # Cache the path where dependencies are installed with a key unique to the existing environment.yml
+        path: /usr/local/miniconda/envs/taswira
+        key:
+          ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment.yml') }}
+      id: envcache
+        
+    - name: Update Conda Environment
+      # Setup (or update) the environment for faster installs
+      run: mamba env update -n taswira -f environment.yml
+      
+    - name: Install Python package
+      shell: bash -l {0}
+      run: |
+        conda activate taswira
+        python -m pip install -e .
+
+    - name: Run Black
+      run: |
+        python -m pip install black
+        black src --diff
+        black --check src
+      
+    - name: Test
+      shell: bash -l {0}
+      # Test the package
+      run: |
+        conda activate taswira
+        python -m pytest

@@ -4,6 +4,7 @@ from enum import Enum
 
 class Units(Enum):
     """Enum of units containing tuple (IsPerHa, Mult, Label)"""
+
     Blank = False, 1, ""
     Tc = False, 1, "tC"
     Ktc = False, 1e3, "KtC"
