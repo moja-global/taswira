@@ -12,7 +12,7 @@ from . import get_config
 from .metadata import get_metadata
 
 DB_NAME = 'terracotta.sqlite'
-GCBM_RASTER_NAME_PATTERN = r'.*_(?P<year>\d{4}).tiff'
+GCBM_RASTER_NAME_PATTERN = r'.*_(?P<year>\d{4}).tif{1,2}'
 GCBM_RASTER_KEYS = ('title', 'year')
 GCBM_RASTER_KEYS_DESCRIPTION = {
     'title': 'Name of indicator',

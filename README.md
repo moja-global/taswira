@@ -21,8 +21,8 @@ Requires [Git] and [Miniconda] (or Anaconda) with Python 3.6 or newer.
 1. Clone the repository and `cd` into it:
 
 ```sh
-git clone https://github.com/moja-global/GCBM.Visualisation_Tool
-cd GCBM.Visualisation_Tool
+git clone https://github.com/moja-global/taswira
+cd taswira
 ```
 
 2. Create a conda environment and activate it:
