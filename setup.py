@@ -30,7 +30,7 @@ setup(
     description="An interactive visualization tool for GCBM",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/moja-global/GCBM.Visualisation_Tool",
+    url="https://github.com/moja-global/taswira",
     author="moja global",
     classifiers=[
         'Development Status :: 3 - Alpha',
