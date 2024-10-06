@@ -2,6 +2,7 @@
 import glob
 import os
 import re
+import logging
 
 import tqdm
 from terracotta import get_driver
@@ -64,10 +65,16 @@ def ingest(rasterdir, db_results, outputdir, allow_unoptimized=False):
             title = raster.get('title', raster['database_indicator'])
             year = _find_raster_year(raster['path'])
             unit = find_units(raster.get('graph_units'))
+            try:
+                indicator_value = str(metadata[title][year])
+            except KeyError:
+                # Handle missing metadata gracefully
+                logging.warning(f"Metadata for year {year} and title {title} is missing.")
+                indicator_value = "N/A"
             computed_metadata = driver.compute_metadata(
                 raster['path'],
                 extra_metadata={
-                    'indicator_value': str(metadata[title][year]),
+                    'indicator_value': indicator_value,
                     'colormap': raster.get('palette').lower(),
                     'unit': unit.value[2]
                 })
