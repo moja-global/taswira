@@ -51,6 +51,7 @@ setup(
         "plotly ==4.8.2",
         "Werkzeug ==1.0.1",
         "tqdm ==4.47.0",
+        "MarkupSafe ==2.0.1"
     ],
     extra_requires={
         'dev': ['pylint>=2.5.2', 'yapf>=0.30', 'isort>=4.3'],
