@@ -31,26 +31,31 @@ def _find_indicator_table(conn, indicator):
 
 def _get_annual_result(conn, indicator, units=Units.Tc):
     table, value_col = _find_indicator_table(conn, indicator)
+
+    # If table is None, skip processing
+    if table is None:
+        print(f"Warning: No table found for indicator '{indicator}', skipping.")
+        return {}
+
     _, units_tc, _ = units.value
     start_year, end_year = _get_simulation_years(conn)
 
     db_result = conn.execute(f"""
-            SELECT years.year, COALESCE(SUM(i.{value_col}), 0) / {units_tc} AS value
-            FROM (SELECT DISTINCT year FROM v_age_indicators ORDER BY year) AS years
-            LEFT JOIN {table} i
-                ON years.year = i.year
-            WHERE i.indicator = '{indicator}'
-                AND (years.year BETWEEN {start_year} AND {end_year})
-            GROUP BY years.year
-            ORDER BY years.year
-            """).fetchall()
+        SELECT years.year, COALESCE(SUM(i.{value_col}), 0) / {units_tc} AS value
+        FROM (SELECT DISTINCT year FROM v_age_indicators ORDER BY year) AS years
+        LEFT JOIN {table} i
+            ON years.year = i.year
+        WHERE i.indicator = '{indicator}'
+            AND (years.year BETWEEN {start_year} AND {end_year})
+        GROUP BY years.year
+        ORDER BY years.year
+    """).fetchall()
 
     data = OrderedDict()
     for year, value in db_result:
         data[str(year)] = value
 
     return data
-
 
 def get_metadata(db_results):
     """Extract all metadata from non-spatial DB.

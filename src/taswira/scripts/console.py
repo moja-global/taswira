@@ -7,7 +7,7 @@ import tempfile
 import threading
 import warnings
 import webbrowser
-
+import socket
 import terracotta as tc
 from terracotta.server.app import app as tc_app
 from werkzeug.serving import run_simple
@@ -22,28 +22,34 @@ def start_servers(dbpath, port):
     """Load given DB and start a Terracotta and Dash server.
 
     Args:
-        dbpath: Path to a Terracota-generated DB.
+        dbpath: Path to a Terracotta-generated DB.
         port: Port number for Terracotta server.
     """
-    def handler(signum, frame):  # pylint: disable=unused-argument
+    def handler(signum, frame):
         sys.exit(0)
 
     signal.signal(signal.SIGINT, handler)
 
+    # Update Terracotta settings
     tc.update_settings(DRIVER_PATH=dbpath, DRIVER_PROVIDER='sqlite')
+
+    # Initialize the Dash app
     app = get_app()
     app.init_app(tc_app)
 
+    # Automatically open browser only if not in Docker
     def open_browser():
         webbrowser.open(f'http://localhost:{port}')
 
-    threading.Timer(2, open_browser).start()
+    if 'IN_DOCKER' not in os.environ:
+        threading.Timer(2, open_browser).start()
 
+    # Start the server
     if 'DEBUG' in os.environ:
-        app.run_server(port=port, threaded=False, debug=True)
+        app.run_server(host='0.0.0.0', port=port, threaded=False, debug=True)
     else:
         print('Starting Taswira...')
-        run_simple('localhost', port, app.server)
+        run_simple('0.0.0.0', port, app.server)
 
 
 def console():
